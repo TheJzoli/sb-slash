@@ -3,7 +3,7 @@ const { userComponents } = require("../util/components.js");
 const { invalidPublicID, noStoredID, timeoutResponse } = require("../util/invalidResponse.js");
 const api = require("../util/min-api.js");
 const { userStrictCheck } = require("../util/validation.js");
-const { hideOption, publicIDOption } = require("../util/commandOptions.js");
+const { hideOption, publicIDOption, pieChartOption } = require("../util/commandOptions.js");
 const [SUBCOMMAND, GROUP] = [1, 2];
 
 // get existing SBID with cache of 24hr
@@ -60,7 +60,8 @@ module.exports = {
         description: "Sort categories in descending order",
         type: 5,
         required: false
-      }
+      },
+      pieChartOption
     ]
   }],
   execute: async ({ interaction, response }) => {
@@ -71,6 +72,9 @@ module.exports = {
     const rootOptions = interaction.data.options[0];
     const cmdName = rootOptions.name;
     const hide = findNestedOption(rootOptions, "hide");
+    const piechart = findNestedOption(rootOptions, "piechart");
+
+    let piechartImageBlob;
 
     // userid set
     if (cmdName === "userid" && rootOptions.options[0].name === "set") {
@@ -113,15 +117,22 @@ module.exports = {
         const sort = findNestedOption(rootOptions, "sort");
         const res = await Promise.race([api.getUserStats(SBID), api.timeout]);
         if (!res) return response(timeoutResponse);
-        embed = format.formatUserStats(SBID,res,sort);
+        embed = format.formatUserStats(SBID, res, sort, piechart);
+        if (piechart) piechartImageBlob = format.createPieChart(res); // returns Blob
       }
       return response({ // misc response
         type: 4,
         data: {
           embeds: [embed],
+          attachments: piechart ? [{
+            "id": 0,
+            "description": "Pie chart of stats",
+            "filename": "piechart.png"
+          }] : [],
           flags: (hide ? 64 : 0)
         }
-      });
+      },
+      piechartImageBlob);
     }
   }
 };

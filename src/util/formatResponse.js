@@ -1,7 +1,8 @@
 const columnify = require("columnify");
 const { getSegmentInfo } = require("./min-api.js");
 const { parseUserAgent } = require("./parseUserAgent.js");
-const { CATEGORIES_ARR } = require("./categories.js");
+const { CATEGORIES_ARR, CATEGORY_COLORS_ARR } = require("./categories.js");
+const Canvas = require("canvas");
 
 // https://github.com/MRuy/sponsorBlockControl/blob/61f0585c9bff9c46f6fde06bb613aadeffb7e189/src/utils.js
 const minutesReadable = (minutes) => {
@@ -312,7 +313,7 @@ const formatResponseTime = (data) => {
   return embed;
 };
 
-const formatUserStats = (publicID, data, sort) => {
+const formatUserStats = (publicID, data, sort, piechart) => {
   // format response
   const total = data.overallStats.segmentCount;
   const timeSaved = minutesReadable(data.overallStats.minutesSaved);
@@ -351,6 +352,7 @@ const formatUserStats = (publicID, data, sort) => {
       value: "```"+columnify(typeData, typeConfig)+"```"
     }
   );
+  if (piechart) embed.image.url = "attachment://piechart.png";
   return embed;
 };
 
@@ -385,6 +387,33 @@ const formatUnsubmitted = (debugObj) => {
   return embed;
 };
 
+const createPieChart = (data) => {
+  const categoryData = [];
+  for (const category in data.categoryCount) {
+    categoryData.push(data.categoryCount[category]);
+  }
+  const canvas = Canvas.createCanvas(500, 500);
+  const ctx = canvas.getContext("2d");
+  let total = 0;
+  for (const i of categoryData) {
+    total += i;
+  }
+  const x = canvas.width / 2;
+  const y = canvas.height / 2;
+  let startAngle = -Math.PI / 2;
+  for (let i = 0; i < categoryData.length; i++) {
+    const sliceAngle = 2 * Math.PI * categoryData[i] / total;
+    ctx.fillStyle = CATEGORY_COLORS_ARR[i];
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.arc(x, y, Math.min(x, y), startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fill();
+    startAngle += sliceAngle;
+  }
+  return new Blob([canvas.toBuffer()], {type: "image/png"}); // TODO Need to check if conversion actually works
+};
+
 module.exports = {
   formatShowoff,
   formatSegment,
@@ -398,5 +427,6 @@ module.exports = {
   formatStatus,
   formatResponseTime,
   formatUserStats,
-  formatUnsubmitted
+  formatUnsubmitted,
+  createPieChart
 };
