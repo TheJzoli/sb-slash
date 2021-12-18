@@ -411,7 +411,7 @@ const createPieChart = (data) => {
     ctx.fill();
     startAngle += sliceAngle;
   }
-  return new Blob([canvas.toBuffer()], {type: "image/png"}); // TODO Need to check if conversion actually works
+  return new Blob([canvas.toBuffer().buffer], {type: "image/png"}); // TODO Need to check if conversion actually works
 };
 
 module.exports = {
