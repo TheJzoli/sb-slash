@@ -352,7 +352,11 @@ const formatUserStats = (publicID, data, sort, piechart) => {
       value: "```"+columnify(typeData, typeConfig)+"```"
     }
   );
-  if (piechart) embed.image.url = "attachment://piechart.png";
+  if (piechart) {
+    embed.image = {
+      url: "attachment://piechart.png"
+    };
+  }
   return embed;
 };
 
