@@ -392,16 +392,18 @@ const createPieChart = (data) => {
   for (const category in data.categoryCount) {
     categoryData.push(data.categoryCount[category]);
   }
-  const canvas = Canvas.createCanvas(500, 500);
+  const canvas = Canvas.createCanvas(325, 200);
   const ctx = canvas.getContext("2d");
   let total = 0;
   for (const i of categoryData) {
     total += i;
   }
-  const x = canvas.width / 2;
+  const x = canvas.width / 3.25;
   const y = canvas.height / 2;
   let startAngle = -Math.PI / 2;
+  ctx.font = "15px Arial";
   for (let i = 0; i < categoryData.length; i++) {
+    // create slice of pie chart
     const sliceAngle = 2 * Math.PI * categoryData[i] / total;
     ctx.fillStyle = CATEGORY_COLORS_ARR[i];
     ctx.beginPath();
@@ -410,6 +412,13 @@ const createPieChart = (data) => {
     ctx.closePath();
     ctx.fill();
     startAngle += sliceAngle;
+    // create square label
+    const rectX = canvas.width - x * 1.25 + 5;
+    const rectY = canvas.height / (categoryData.length + 1) * (i + 1) - 7.5;
+    const rectSize = 15;
+    ctx.fillRect(rectX, rectY, rectSize, rectSize);
+    // create label text
+    ctx.fillText(CATEGORIES_ARR[i], rectX + 20, rectY + rectSize * 0.75);
   }
   return new Blob([canvas.toBuffer().buffer], {type: "image/png"}); // TODO Need to check if conversion actually works
 };
