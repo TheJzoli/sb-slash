@@ -31,20 +31,12 @@ module.exports = {
     const parsedUser = await Promise.race([getUserStats(userID), timeout]);
     if (!parsedUser) return response(timeoutResponse);
     const embed = formatUserStats(userID, parsedUser, sort, piechart);
-    let piechartImageBlob;
-    if (piechart) piechartImageBlob = createPieChart(parsedUser); // returns Blob
     return response({
       type: 4,
       data: {
         embeds: [embed],
-        attachments: piechart ? [{
-          "id": 0,
-          "description": "Pie chart of stats",
-          "filename": "piechart.png"
-        }] : [],
         flags: (hide ? 64 : 0)
       }
     },
-    piechartImageBlob);
   }
 };
