@@ -2,7 +2,7 @@ const columnify = require("columnify");
 const { getSegmentInfo } = require("./min-api.js");
 const { parseUserAgent } = require("./parseUserAgent.js");
 const { CATEGORIES_ARR, CATEGORY_COLORS_ARR } = require("./categories.js");
-const Canvas = require("canvas");
+const pImg = require("pureimage");
 
 // https://github.com/MRuy/sponsorBlockControl/blob/61f0585c9bff9c46f6fde06bb613aadeffb7e189/src/utils.js
 const minutesReadable = (minutes) => {
@@ -396,7 +396,8 @@ const createPieChart = (data) => {
   for (const category in data.categoryCount) {
     categoryData.push(data.categoryCount[category]);
   }
-  const canvas = Canvas.createCanvas(325, 200);
+  const canvas = pImg.make(325, 200, {});
+  //const canvas = Canvas.createCanvas(325, 200);
   const ctx = canvas.getContext("2d");
   let total = 0;
   for (const i of categoryData) {
@@ -405,14 +406,14 @@ const createPieChart = (data) => {
   const x = canvas.width / 3.25;
   const y = canvas.height / 2;
   let startAngle = -Math.PI / 2;
-  ctx.font = "15px Arial";
+  ctx.font = {family: "Arial", size: 15};
   for (let i = 0; i < categoryData.length; i++) {
     // create slice of pie chart
     const sliceAngle = 2 * Math.PI * categoryData[i] / total;
     ctx.fillStyle = CATEGORY_COLORS_ARR[i];
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.arc(x, y, Math.min(x, y), startAngle, startAngle + sliceAngle);
+    ctx.arc(x, y, Math.min(x, y), startAngle, startAngle + sliceAngle, false);
     ctx.closePath();
     ctx.fill();
     startAngle += sliceAngle;
@@ -424,7 +425,7 @@ const createPieChart = (data) => {
     // create label text
     ctx.fillText(CATEGORIES_ARR[i], rectX + 20, rectY + rectSize * 0.75);
   }
-  return new Blob([canvas.toBuffer().buffer], {type: "image/png"}); // TODO Need to check if conversion actually works
+  return new Blob([canvas.data], {type: "image/png"}); // TODO Need to check if conversion actually works
 };
 
 module.exports = {
