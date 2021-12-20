@@ -354,7 +354,7 @@ const formatUserStats = (publicID, data, sort, piechart) => {
   );
   if (piechart) {
     embed.image = {
-      url: "attachment://piechart.png"
+      url: `https://sb-img.mchang.xyz/pie?userID=${publicID}`
     };
   }
   return embed;
@@ -389,43 +389,6 @@ const formatUnsubmitted = (debugObj) => {
   embed.description = mapped.map((s) => formatUnsubmittedTemplate(s)).join("\n");
   embed.description += `\n\n[Playlist](https://www.youtube.com/watch_videos?video_ids=${mapped.map((s) => s.videoID).join(",")})`;
   return embed;
-};
-
-const createPieChart = (data) => {
-  const categoryData = [];
-  for (const category in data.categoryCount) {
-    categoryData.push(data.categoryCount[category]);
-  }
-  const canvas = pImg.make(325, 200, {});
-  //const canvas = Canvas.createCanvas(325, 200);
-  const ctx = canvas.getContext("2d");
-  let total = 0;
-  for (const i of categoryData) {
-    total += i;
-  }
-  const x = canvas.width / 3.25;
-  const y = canvas.height / 2;
-  let startAngle = -Math.PI / 2;
-  ctx.font = {family: "Arial", size: 15};
-  for (let i = 0; i < categoryData.length; i++) {
-    // create slice of pie chart
-    const sliceAngle = 2 * Math.PI * categoryData[i] / total;
-    ctx.fillStyle = CATEGORY_COLORS_ARR[i];
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.arc(x, y, Math.min(x, y), startAngle, startAngle + sliceAngle, false);
-    ctx.closePath();
-    ctx.fill();
-    startAngle += sliceAngle;
-    // create square label
-    const rectX = canvas.width - x * 1.25 + 5;
-    const rectY = canvas.height / (categoryData.length + 1) * (i + 1) - 7.5;
-    const rectSize = 15;
-    ctx.fillRect(rectX, rectY, rectSize, rectSize);
-    // create label text
-    ctx.fillText(CATEGORIES_ARR[i], rectX + 20, rectY + rectSize * 0.75);
-  }
-  return new Blob([canvas.data], {type: "image/png"}); // TODO Need to check if conversion actually works
 };
 
 module.exports = {
