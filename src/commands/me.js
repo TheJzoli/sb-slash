@@ -74,8 +74,6 @@ module.exports = {
     const hide = findNestedOption(rootOptions, "hide");
     const piechart = findNestedOption(rootOptions, "piechart");
 
-    let piechartImageBlob;
-
     // userid set
     if (cmdName === "userid" && rootOptions.options[0].name === "set") {
       // get option and return if error
@@ -118,21 +116,14 @@ module.exports = {
         const res = await Promise.race([api.getUserStats(SBID), api.timeout]);
         if (!res) return response(timeoutResponse);
         embed = format.formatUserStats(SBID, res, sort, piechart);
-        if (piechart) piechartImageBlob = format.createPieChart(res); // returns Blob
       }
       return response({ // misc response
         type: 4,
         data: {
           embeds: [embed],
-          attachments: piechart ? [{
-            "id": 0,
-            "description": "Pie chart of stats",
-            "filename": "piechart.png"
-          }] : [],
           flags: (hide ? 64 : 0)
         }
-      },
-      piechartImageBlob);
+      });
     }
   }
 };

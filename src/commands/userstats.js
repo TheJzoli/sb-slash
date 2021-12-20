@@ -37,6 +37,6 @@ module.exports = {
         embeds: [embed],
         flags: (hide ? 64 : 0)
       }
-    },
+    });
   }
 };

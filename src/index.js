@@ -21,16 +21,6 @@ const jsonResponse = (obj) => new Response(JSON.stringify(obj), {
   }
 });
 
-const jsonOrFormDataResponse = (obj, blob) => {
-  if (blob) {
-    const fd = new FormData();
-    fd.append("payload_json", JSON.stringify(obj));
-    fd.append("files[0]", blob, "piechart.png");
-    return new Response(fd);
-  }
-  return jsonResponse(obj);
-};
-
 const textResponse = (str) => new Response(str, {
   headers: {
     "Content-Type": "text/plain",
@@ -75,7 +65,7 @@ const handleInteraction = async ({ request, wait }) => {
       } else if (commands.find((e) => e === commandName)) { // check in commands list
         // load and execute
         const command = require(`./commands/${commandName}.js`);
-        return await command.execute({ interaction: body, response: jsonOrFormDataResponse, wait });
+        return await command.execute({ interaction: body, response: jsonResponse, wait });
       } else { // command not found, 404
         return new Response(null, { status: 404 });
       }
