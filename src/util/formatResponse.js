@@ -2,7 +2,6 @@ const columnify = require("columnify");
 const { getSegmentInfo } = require("./min-api.js");
 const { parseUserAgent } = require("./parseUserAgent.js");
 const { CATEGORIES_ARR, CATEGORY_COLORS_ARR } = require("./categories.js");
-const pImg = require("pureimage");
 
 // https://github.com/MRuy/sponsorBlockControl/blob/61f0585c9bff9c46f6fde06bb613aadeffb7e189/src/utils.js
 const minutesReadable = (minutes) => {
